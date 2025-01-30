@@ -187,19 +187,25 @@ func (a *appCtx) GetCompose(ctx context.Context, provider compose.BlobProvider) 
 }
 
 func ReadAppManifest(ctx context.Context, provider compose.BlobProvider, ref string) (*appCtx, *ocispec.Descriptor, error) {
+  fmt.Println("ReadAppManifest")
+  fmt.Println("ref: ", ref)
+  fmt.Println("ParseAndCheckAppRef")
 	appRef, err := parseAndCheckAppRef(ref)
 	if err != nil {
 		return nil, nil, err
 	}
 	app := appCtx{AppRef: *appRef}
+  fmt.Println("ReadBlobWithReadLimit")
 	b, err := compose.ReadBlobWithReadLimit(compose.WithBlobType(WithAppRef(ctx, appRef), compose.BlobTypeAppManifest),
 		provider, ref, AppManifestMaxSize)
 	if err != nil {
 		return &app, nil, err
 	}
+  fmt.Println("Unmarshal")
 	if err := json.Unmarshal(b, &app.manifest); err != nil {
 		return &app, nil, err
 	}
+  fmt.Println("MediaType")
 	if app.manifest.MediaType != AppManifestMediaType {
 		return nil, nil, fmt.Errorf("invald app manifest media type; expected: %s, got: %s", AppManifestMediaType, app.manifest.MediaType)
 	}
