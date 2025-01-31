@@ -62,24 +62,32 @@ func NewMemoryBlobProvider(blobs map[digest.Digest][]byte) BlobProvider {
 }
 
 func (store *storeBlobProvider) GetReadCloser(ctx context.Context, opts ...SecureReadOptions) (io.ReadCloser, error) {
+  fmt.Println("storeBlobProvider.GetReadCloser")
 	newOpts := opts
+  fmt.Println("GetSecureReadParams")
 	p := GetSecureReadParams(opts...)
+  fmt.Println("p.ExpectedDigest")
 	if len(p.ExpectedDigest) == 0 {
 		if len(p.Ref) > 0 {
 			s, err := reference.Parse(p.Ref)
 			if err != nil {
 				return nil, err
 			}
+      fmt.Println("s.Digest()")
 			p.ExpectedDigest = s.Digest()
+      fmt.Println("p.ExpectedDigest")
 			newOpts = append(newOpts, WithExpectedDigest(p.ExpectedDigest))
 		} else {
+      fmt.Println("missing parameters")
 			return nil, fmt.Errorf("missing parameters: either `SecureReadOpts.Ref` or `SecureReadOpts.ExpectedDigest` should be specified")
 		}
 	}
+  fmt.Println("os.Open")
 	f, err := os.Open(path.Join(store.appStoreBlobRoot, p.ExpectedDigest.Encoded()))
 	if err != nil {
 		return nil, err
 	}
+  fmt.Println("NewSecureReadCloser")
 	return NewSecureReadCloser(f, newOpts...)
 }
 
@@ -88,24 +96,32 @@ func (store *storeBlobProvider) Info(ctx context.Context, dgst digest.Digest) (c
 }
 
 func (l *localBlobProvider) GetReadCloser(ctx context.Context, opts ...SecureReadOptions) (io.ReadCloser, error) {
+  fmt.Println("localBlobProvider.GetReadCloser")
 	newOpts := opts
+  fmt.Println("GetSecureReadParams")
 	p := GetSecureReadParams(opts...)
+  fmt.Println("p.ExpectedDigest")
 	if len(p.ExpectedDigest) == 0 {
 		if len(p.Ref) > 0 {
 			s, err := reference.Parse(p.Ref)
 			if err != nil {
 				return nil, err
 			}
+      fmt.Println("s.Digest()")
 			p.ExpectedDigest = s.Digest()
+      fmt.Println("p.ExpectedDigest")
 			newOpts = append(newOpts, WithExpectedDigest(p.ExpectedDigest))
 		} else {
+      fmt.Println("missing parameters")
 			return nil, fmt.Errorf("missing parameters: either `SecureReadOpts.Ref` or `SecureReadOpts.ExpectedDigest` should be specified")
 		}
 	}
+  fmt.Println("l.localFileProvider.ReaderAt")
 	ra, err := l.localFileProvider.ReaderAt(ctx, ocispec.Descriptor{Digest: p.ExpectedDigest})
 	if err != nil {
 		return nil, err
 	}
+  fmt.Println("NewSecureReadCloser")
 	return NewSecureReadCloser(&readCloserWrapper{reader: content.NewReader(ra), closer: ra}, newOpts...)
 }
 
