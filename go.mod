@@ -7,7 +7,7 @@ require (
 	github.com/containerd/containerd v1.7.15
 	github.com/docker/cli v25.0.3+incompatible
 	github.com/docker/distribution v2.8.1+incompatible
-	github.com/docker/docker v25.0.3+incompatible
+	github.com/docker/docker v25.0.6+incompatible
 	github.com/docker/go-units v0.5.0
 	github.com/moby/patternmatcher v0.6.0
 	github.com/opencontainers/go-digest v1.0.0
